@@ -1,4 +1,5 @@
-AUTOMAKE_OPTIONS = gnu
+# AUTOMAKE_OPTIONS = gnu
+AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = test
 
