@@ -96,7 +96,8 @@ ts_map_laser_ray(ts_map_t *map, int x1, int y1, int x2, int y2,
         SWAP(dx, dy); SWAP(dxc, dyc); SWAP(incptrx, incptry);        
         derrorv = abs(yp - y2);
     }
-    error = 2 * dyc - dxc;
+    /* error = 2 * dyc - dxc; */
+    error = -dxc;
     horiz = 2 * dyc;
     diago = 2 * (dyc - dxc);
     errorv = derrorv / 2;
