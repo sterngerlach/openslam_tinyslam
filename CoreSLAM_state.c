@@ -39,14 +39,17 @@ ts_build_scan(ts_sensor_data_t *sd, ts_scan_t *scan, ts_state_t *state, int span
             if (i > state->laser_params.detection_margin && i < state->laser_params.scan_size - state->laser_params.detection_margin) {
                 if (sd->d[i] == 0) {
                     scan->x[scan->nb_points] = state->laser_params.distance_no_detection * cos(angle_rad);
-                    scan->x[scan->nb_points] -= sd->v * 1000 * ((double)(i * span + j)) * (state->laser_params.angle_max - state->laser_params.angle_min) / (state->laser_params.scan_size * span - 1) / 3600.0;
+                    /* scan->x[scan->nb_points] -= sd->v * 1000 * ((double)(i * span + j)) * (state->laser_params.angle_max - state->laser_params.angle_min) / (state->laser_params.scan_size * span - 1) / 3600.0; */
+                    scan->x[scan->nb_points] += sd->v * 1000 * ((double)(i * span + j)) * (state->laser_params.angle_max - state->laser_params.angle_min) / (state->laser_params.scan_size * span - 1) / 3600.0;
+
                     scan->y[scan->nb_points] = state->laser_params.distance_no_detection * sin(angle_rad);
                     scan->value[scan->nb_points] = TS_NO_OBSTACLE;
                     scan->nb_points++;
                 }
                 if (sd->d[i] > state->hole_width / 2) {
                     scan->x[scan->nb_points] = sd->d[i] * cos(angle_rad);
-                    scan->x[scan->nb_points] -= sd->v * 1000 * ((double)(i * span + j)) * (state->laser_params.angle_max - state->laser_params.angle_min) / (state->laser_params.scan_size * span - 1) / 3600.0;
+                    /* scan->x[scan->nb_points] -= sd->v * 1000 * ((double)(i * span + j)) * (state->laser_params.angle_max - state->laser_params.angle_min) / (state->laser_params.scan_size * span - 1) / 3600.0; */
+                    scan->x[scan->nb_points] += sd->v * 1000 * ((double)(i * span + j)) * (state->laser_params.angle_max - state->laser_params.angle_min) / (state->laser_params.scan_size * span - 1) / 3600.0;
                     scan->y[scan->nb_points] = sd->d[i] * sin(angle_rad);
                     scan->value[scan->nb_points] = TS_OBSTACLE;
                     scan->nb_points++;
@@ -69,12 +72,12 @@ void ts_iterative_map_building(ts_sensor_data_t *sd, ts_state_t *state)
         v = m * (sd->q1 - state->q1 + (sd->q2 - state->q2) * state->params.ratio);
         thetarad = state->position.theta * M_PI / 180;
         position = state->position;
-        position.x += v * 1000 * cos(thetarad);
-        position.y += v * 1000 * sin(thetarad);
+        position.x += v * 1000 * cos(thetarad); // position.xはmm単位
+        position.y += v * 1000 * sin(thetarad); // position.yはmm単位
         psidot = (m * ((sd->q2 - state->q2) * state->params.ratio - sd->q1 + state->q1) / state->params.R) * 180 / M_PI;
         position.theta += psidot;
-        v *= 1000000.0 / (sd->timestamp - state->timestamp);
-        psidot *= 1000000.0 / (sd->timestamp - state->timestamp); 
+        v *= 1000000.0 / (sd->timestamp - state->timestamp); // timestampはus単位 / vはdeg/s単位
+        psidot *= 1000000.0 / (sd->timestamp - state->timestamp); // timestampはus単位 / psidotはdeg/s単位
     } else {
         state->psidot = psidot = 0;
         state->v = v = 0;
@@ -88,6 +91,7 @@ void ts_iterative_map_building(ts_sensor_data_t *sd, ts_state_t *state)
         sd->psidot = state->psidot;
         sd->v = state->v;
     }
+
     ts_build_scan(sd, &scan2map, state, 3);
     ts_build_scan(sd, &state->scan, state, 1);
 
