@@ -102,20 +102,21 @@ ts_position_t ts_monte_carlo_search(ts_randomizer_t *randomizer, ts_scan_t *scan
     bestdist = lastbestdist = currentdist;
 
     do {
-	currentpos = lastbestpos;
-	currentpos.x = ts_random_normal(randomizer, currentpos.x, sigma_xy);
-	currentpos.y = ts_random_normal(randomizer, currentpos.y, sigma_xy);
-	currentpos.theta = ts_random_normal(randomizer, currentpos.theta, sigma_theta);
+        currentpos = lastbestpos;
+        currentpos.x = ts_random_normal(randomizer, currentpos.x, sigma_xy);
+        currentpos.y = ts_random_normal(randomizer, currentpos.y, sigma_xy);
+        currentpos.theta = ts_random_normal(randomizer, currentpos.theta, sigma_theta);
 
-	currentdist = ts_distance_scan_to_map(scan, map, &currentpos);
-	
-	if (currentdist < bestdist) {
-	    bestdist = currentdist;
-	    bestpos = currentpos;
+        currentdist = ts_distance_scan_to_map(scan, map, &currentpos);
+        
+        if (currentdist < bestdist) {
+            bestdist = currentdist;
+            bestpos = currentpos;
             if (debug) printf("Monte carlo ! %lg %lg %lg %d (count = %d)\n", bestpos.x, bestpos.y, bestpos.theta, bestdist, counter);
-	} else {
-	    counter++;
-	}
+        } else {
+            counter++;
+        }
+
         if (counter > stop / 3) {
             if (bestdist < lastbestdist) {
                 lastbestpos = bestpos;
@@ -126,8 +127,10 @@ ts_position_t ts_monte_carlo_search(ts_randomizer_t *randomizer, ts_scan_t *scan
             }
         }
     } while (counter < stop);
+
     if (bd)
         *bd = bestdist;
+
     return bestpos;
 }
 

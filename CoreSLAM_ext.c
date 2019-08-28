@@ -19,13 +19,13 @@ ts_save_map_pgm(ts_map_t *map, ts_map_t *overlay, char *filename, int width, int
     y = (TS_MAP_SIZE - height) / 2;
     for (yp = 0; yp < height; y++, yp++) {
         x = (TS_MAP_SIZE - width) / 2; 
-	for (xp = 0; xp < width; x++, xp++) {
-	    if (overlay->map[ (TS_MAP_SIZE - 1 - y) * TS_MAP_SIZE + x] == 0) 
+        for (xp = 0; xp < width; x++, xp++) {
+            if (overlay->map[(TS_MAP_SIZE - 1 - y) * TS_MAP_SIZE + x] == 0) 
                 fprintf(output, "0 ");
             else 
-                fprintf(output, "%d ", (int)(map->map[ (TS_MAP_SIZE - 1 - y) * TS_MAP_SIZE + x]) >> 8);
-	}
-	fprintf(output, "\n");
+                fprintf(output, "%d ", (int)(map->map[(TS_MAP_SIZE - 1 - y) * TS_MAP_SIZE + x]) >> 8);
+        }
+        fprintf(output, "\n");
     }
     fclose(output);
 }
